@@ -9,12 +9,14 @@ import (
 	"syscall"
 
 	"github.com/cosmtrek/air/runner"
+	"github.com/fatih/color"
 )
 
 var (
 	cfgPath     string
 	debugMode   bool
 	showVersion bool
+	forceColor  bool
 	cmdArgs     map[string]runner.TomlInfo
 	runArgs     []string
 )
@@ -38,6 +40,7 @@ func parseFlag(args []string) {
 	flag.StringVar(&cfgPath, "c", "", "config path")
 	flag.BoolVar(&debugMode, "d", false, "debug mode")
 	flag.BoolVar(&showVersion, "v", false, "show version")
+	flag.BoolVar(&forceColor, "p", false, "force color")
 	cmd := flag.CommandLine
 	cmdArgs = runner.ParseConfigFlag(cmd)
 	flag.CommandLine.Parse(args)
@@ -68,6 +71,9 @@ func main() {
 		return
 	}
 	cfg.WithArgs(cmdArgs)
+	if forceColor {
+		color.NoColor = false
+	}
 	r, err := runner.NewEngineWithConfig(cfg, debugMode)
 	if err != nil {
 		log.Fatal(err)
